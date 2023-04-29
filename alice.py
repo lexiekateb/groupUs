@@ -4,9 +4,17 @@ from functools import partial
 from tkinter import *
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
+import sys
+from user import send_m
+
+# sys.path.append("..")
+
+# from main import top, client, shared_key, small_key
+
+# modified arguments to grab client and small key from main.py
 
 
-def main(top):
+def main(top, client, small_key):
     # Setting up the window
     alice = top
     alice.title("ALICE")
@@ -44,6 +52,10 @@ def main(top):
         message = "ALICE: " + message
         Label(frame, text=message, fg="purple", bg="lightgrey", font=("Lato", 16)).pack(side=TOP, anchor=NW)
 
+        # send the encrypted message to Bob
+        send_msg = ciphertext + nonce
+        send_m(message)
+
         dcipher = AES.new(key, AES.MODE_EAX, cipher.nonce)
         end = dcipher.decrypt(ciphertext)
         end = end.decode('utf-8')
@@ -60,5 +72,6 @@ def main(top):
     alice.mainloop()
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+    # main(top, client, shared_key, small_key)
+    # main()
