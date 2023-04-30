@@ -21,13 +21,13 @@ def send_m(msg):
     send_length += b' ' * (HEADER - len(send_length))
     client.send(send_length)
     client.send(message)
-    print(client.recv(2048).decode(FORMAT))
+    # print(client.recv(2048).decode(FORMAT))
 
 
-# send(" ")
-# text = input()
-# while text:
-    # send(text)
-    # text = input()
+send_m(" ")
+text = input()
+while text:
+    send_m(text)
+    text = input()
 
-# send(DISCONNECT_MESSAGE)
+send_m(DISCONNECT_MESSAGE)

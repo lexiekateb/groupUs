@@ -39,7 +39,7 @@ def handle_client(conn, addr):
                 connected = False
 
             print(f"[{addr}] {msg}")
-            conn.send("Msg received".encode(FORMAT))
+            # conn.send("Msg received".encode(FORMAT))
 
     # disconnect the client when they leave the server
     conn.close()

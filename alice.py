@@ -5,7 +5,9 @@ from tkinter import *
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 import sys
-from user import send_m
+import math
+import pyDHE
+# from user import send_m
 
 # sys.path.append("..")
 
@@ -13,8 +15,14 @@ from user import send_m
 
 # modified arguments to grab client and small key from main.py
 
+HEADER = 64
+PORT = 5050
+FORMAT = 'utf-8'
+DISCONNECT_MESSAGE = "!DISCONNECT"
+SERVER = "127.0.0.1"  # socket.gethostbyname(socket.gethostname())
+ADDR = (SERVER, PORT)
 
-def main(top, client, small_key):
+def main(top):
     # Setting up the window
     alice = top
     alice.title("ALICE")
@@ -25,6 +33,18 @@ def main(top, client, small_key):
     Label(alice, text='Establishing connection...').pack()
 
     # ESTABLISH CONNECTION HERE
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect(ADDR)
+
+    # Diffie-Hellman function for key generation
+    bob = pyDHE.new(14)
+    bob_pub_key = bob.getPublicKey()
+    bob_pub_key_bytes = bob_pub_key.to_bytes(math.ceil(bob_pub_key.bit_length() / 8), sys.byteorder, signed=False)
+    client.sendall(bob_pub_key_bytes)
+    alice_pub_key_bytes = client.recv(2048)  # may need to change to 1024
+    alice_pub_key = int.from_bytes(alice_pub_key_bytes, sys.byteorder, signed=False)
+    shared_key = bob.update(alice_pub_key)
+    small_key = int(str(shared_key)[:128])
 
     key = get_random_bytes(16)
     cipher = AES.new(key, AES.MODE_EAX)
@@ -54,11 +74,12 @@ def main(top, client, small_key):
 
         # send the encrypted message to Bob
         send_msg = ciphertext + nonce
-        send_m(message)
+        print(send_msg)
+        # send_m(message)
 
         dcipher = AES.new(key, AES.MODE_EAX, cipher.nonce)
-        end = dcipher.decrypt(ciphertext)
-        end = end.decode('utf-8')
+        # end = dcipher.decrypt(ciphertext)
+        # end = end.decode('utf-8')
 
     def receive(bobMess, nonce, key):
         dcipher = AES.new(key, AES.MODE_EAX, nonce)
