@@ -2,6 +2,11 @@ import tkinter as tk
 import alice
 import bob
 from tkinter import *
+import socket
+import pyDHE
+import sys
+import math
+
 
 gus = tk.Tk()
 gus.title("GroupUs")
