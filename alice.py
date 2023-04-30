@@ -73,9 +73,8 @@ def main(top):
 
         # send the encrypted message to Bob through socket
         send_msg = ciphertext
-        # user.send_m(send_msg)  # may need to modify this line
-        client.send(send_msg)
-        # TODO: socket stuff to send cipher
+        user.send_m(send_msg)  # may need to modify this line
+        # client.send(send_msg)
 
     # When socket detects message, use this to decrypt
     def receive(nonce, small_key):

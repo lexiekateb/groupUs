@@ -14,6 +14,7 @@ client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
 
 
+# send messages to server to be received by other clients
 def send_m(msg):
     message = msg.encode(FORMAT)
     msg_length = len(message)
@@ -24,10 +25,3 @@ def send_m(msg):
     # print(client.recv(2048).decode(FORMAT))
 
 
-# send_m(" ")
-# text = input()
-# while text:     # this makes it run constantly, and if we import it it shouldn't be able to
-    # send_m(text)
-    # text = input()
-
-# send_m(DISCONNECT_MESSAGE)

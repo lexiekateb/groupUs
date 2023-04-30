@@ -14,6 +14,10 @@ DISCONNECT_MESSAGE = "!DISCONNECT"
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
+# create a list of the clients connected to the server and list of messages to be sent to clients
+connections = []
+messages = []
+
 
 def handle_client(conn, addr):
     print(f"[NEW CONNECTION] {addr} connected.")
@@ -27,7 +31,6 @@ def handle_client(conn, addr):
     alice_pub_key_bytes = alice_pub_key.to_bytes(math.ceil(alice_pub_key.bit_length() / 8), sys.byteorder, signed=False)
     conn.sendall(alice_pub_key_bytes)
     small_key = int(str(shared_key)[:128])
-    #conn.send(f"Here is your key: {small_key}".encode(FORMAT))
 
     connected = True
     while connected:
@@ -37,9 +40,19 @@ def handle_client(conn, addr):
             msg = conn.recv(msg_length).decode(FORMAT)
             if msg == DISCONNECT_MESSAGE:
                 connected = False
+                # remove the connection when no longer active
+                connections.remove((conn, addr))
 
-            print(f"[{addr}] {msg}")
-            # conn.send("Msg received".encode(FORMAT))
+            else:
+                print(f"[{addr}] {msg}")
+                # store message
+                message = f"[{addr}] {msg}"
+                messages.append(message)
+
+                # send message to other clients
+                for connection, address in connections:
+                    if address != addr:
+                        connection.send(f"{message}\n".encode(FORMAT))
 
     # disconnect the client when they leave the server
     conn.close()
