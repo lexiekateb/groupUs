@@ -44,9 +44,7 @@ def main(top):
         message = "ALICE: " + message
         Label(frame, text=message, fg="purple", bg="lightgrey", font=("Lato", 16)).pack(side=TOP, anchor=NW)
 
-        dcipher = AES.new(key, AES.MODE_EAX, cipher.nonce)
-        end = dcipher.decrypt(ciphertext)
-        end = end.decode('utf-8')
+        # TODO: socket stuff to send cipher
 
     def receive(bobMess, nonce, key):
         dcipher = AES.new(key, AES.MODE_EAX, nonce)
@@ -59,6 +57,4 @@ def main(top):
 
     alice.mainloop()
 
-
-if __name__ == "__main__":
-    main()
+#

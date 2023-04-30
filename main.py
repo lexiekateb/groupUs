@@ -1,5 +1,6 @@
 import tkinter as tk
 import alice
+import bob
 from tkinter import *
 
 gus = tk.Tk()
@@ -28,10 +29,10 @@ def openBob():
     givenPass = e2.get()
 
     if truePass == givenPass:
-        gus.withdraw()
-        exec(open("./bob.py").read())
+        top = Toplevel()
+        bob.main(top)
     else:
-        Label(gus, text='WRONG PASSWORD', fg="red").place(x=300, y=300)
+        Label(gus, text='WRONG PASSWORD', fg="red").place(x=700, y=300)
 
 
 # Buttons to enter password
