@@ -11,6 +11,9 @@ ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 
+# list of active connections...
+# connections = []
+
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
@@ -27,7 +30,11 @@ def handle_client(conn, addr):
     alice_pub_key_bytes = alice_pub_key.to_bytes(math.ceil(alice_pub_key.bit_length() / 8), sys.byteorder, signed=False)
     conn.sendall(alice_pub_key_bytes)
     small_key = int(str(shared_key)[:128])
-    conn.send(f"Here is your key: {small_key}".encode(FORMAT))
+    conn.send(f"Here is your key: {small_key}".encode(FORMAT))  # may need to change
+
+    # add the connection to a list of active connections.
+    # connections.append((conn, addr))
+
 
     connected = True
     while connected:
