@@ -5,7 +5,6 @@ import socket
 import pyDHE
 import sys
 import math
-# from server import start_server
 
 
 gus = tk.Tk()
@@ -23,11 +22,7 @@ def openAlice():
     givenPass = e1.get()
 
     if truePass == givenPass:
-
         top = Toplevel()
-        # alice.main(top, client, shared_key, small_key)
-        # alice.main(top, client, small_key)
-        # alice.send_m(Entry(alice))
         alice.main(top)
     else:
         Label(gus, text='WRONG PASSWORD', fg="red").place(x=300, y=300)
@@ -57,6 +52,3 @@ bA.place(x=500, y=270)
 bB.place(x=900, y=270)
 
 gus.mainloop()
-
-# if __name__ == '__main__':
-# start_server()

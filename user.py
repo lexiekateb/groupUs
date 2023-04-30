@@ -7,7 +7,7 @@ HEADER = 64
 PORT = 5050
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = socket.gethostbyname(socket.gethostname())
+SERVER = "127.0.0.1"
 ADDR = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -24,10 +24,10 @@ def send_m(msg):
     # print(client.recv(2048).decode(FORMAT))
 
 
-send_m(" ")
-text = input()
-while text:
-    send_m(text)
-    text = input()
+# send_m(" ")
+# text = input()
+# while text:     # this makes it run constantly, and if we import it it shouldn't be able to
+    # send_m(text)
+    # text = input()
 
-send_m(DISCONNECT_MESSAGE)
+# send_m(DISCONNECT_MESSAGE)

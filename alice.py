@@ -3,17 +3,10 @@ import tkinter as tk
 from functools import partial
 from tkinter import *
 from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
 import sys
 import math
 import pyDHE
-# from user import send_m
-
-# sys.path.append("..")
-
-# from main import top, client, shared_key, small_key
-
-# modified arguments to grab client and small key from main.py
+import user
 
 HEADER = 64
 PORT = 5050
@@ -21,6 +14,7 @@ FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 SERVER = "127.0.0.1"  # socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
+
 
 def main(top):
     # Setting up the window
@@ -30,9 +24,8 @@ def main(top):
     height = alice.winfo_screenheight()
     alice.geometry("%dx%d" % (width, height))
 
-    Label(alice, text='Establishing connection...').pack()
-
     # ESTABLISH CONNECTION HERE
+    Label(alice, text='Establishing connection...').pack()
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(ADDR)
 
@@ -44,16 +37,19 @@ def main(top):
     alice_pub_key_bytes = client.recv(2048)  # may need to change to 1024
     alice_pub_key = int.from_bytes(alice_pub_key_bytes, sys.byteorder, signed=False)
     shared_key = bob.update(alice_pub_key)
-    small_key = int(str(shared_key)[:128])
+    small_key = bytes(str(shared_key)[:16], 'utf-8')
 
-    key = get_random_bytes(16)
-    cipher = AES.new(key, AES.MODE_EAX)
+    print("make it here")
+    print(small_key)
+    # Creating ciper using key from DH
+    cipher = AES.new(small_key, AES.MODE_EAX)
     nonce = cipher.nonce
 
     Label(alice, text='Connection established.').pack()
+
+    # GUI stuff
     e2 = Entry(alice)
     e2.place(x=500, y=500)
-
     frame = Frame(alice, width=400, height=400, bg="lightgrey")
     frame.place(x=450, y=50)
     frame.pack_propagate(0)
@@ -67,32 +63,31 @@ def main(top):
         # clear text entry
         e2.delete(0, END)
 
+        # Transforming message to bytes
         bitMess = bytes(message, 'utf-8')
         ciphertext = cipher.encrypt(bitMess)
+
+        # Putting text on screen
         message = "ALICE: " + message
         Label(frame, text=message, fg="purple", bg="lightgrey", font=("Lato", 16)).pack(side=TOP, anchor=NW)
 
-        # send the encrypted message to Bob
-        send_msg = ciphertext + nonce
-        print(send_msg)
-        # send_m(message)
+        # send the encrypted message to Bob through socket
+        send_msg = ciphertext
+        # user.send_m(send_msg)  # may need to modify this line
+        client.send(send_msg)
 
-        dcipher = AES.new(key, AES.MODE_EAX, cipher.nonce)
-        # end = dcipher.decrypt(ciphertext)
-        # end = end.decode('utf-8')
-
-    def receive(bobMess, nonce, key):
-        dcipher = AES.new(key, AES.MODE_EAX, nonce)
+    # When socket detects message, use this to decrypt
+    def receive(bobMess, nonce, small_key):
+        # Replicating cipher / decyphering
+        dcipher = AES.new(small_key, AES.MODE_EAX, nonce)
         bitMess = dcipher.decrypt(bobMess)
         end = bitMess.decode('utf-8')
-        Label(frame, text=end, fg="blue", bg="lightgrey", font=("Lato", 16)).pack(side=TOP, anchor=NE)
-        return end
 
+        # placing on GUI
+        Label(frame, text=end, fg="blue", bg="lightgrey", font=("Lato", 16)).pack(side=TOP, anchor=NE)
+
+    # Button to send message
     Button(alice, text="Send", command=partial(send, cipher)).place(x=700, y=500)
 
+    # Keeps screen open until user closes windows
     alice.mainloop()
-
-
-# if __name__ == "__main__":
-    # main(top, client, shared_key, small_key)
-    # main()
