@@ -27,7 +27,7 @@ def handle_client(conn, addr):
     alice_pub_key_bytes = alice_pub_key.to_bytes(math.ceil(alice_pub_key.bit_length() / 8), sys.byteorder, signed=False)
     conn.sendall(alice_pub_key_bytes)
     small_key = int(str(shared_key)[:128])
-    conn.send(f"Here is your key: {small_key}".encode(FORMAT))
+    #conn.send(f"Here is your key: {small_key}".encode(FORMAT))
 
     connected = True
     while connected:

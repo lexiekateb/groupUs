@@ -78,18 +78,43 @@ def main(top):
         # TODO: socket stuff to send cipher
 
     # When socket detects message, use this to decrypt
-    def receive(bobMess, nonce, small_key):
-        # Replicating cipher / decyphering
-        dcipher = AES.new(small_key, AES.MODE_EAX, nonce)
-        bitMess = dcipher.decrypt(bobMess)
-        end = bitMess.decode('utf-8')
+    def receive(nonce, small_key):
+        client.setblocking(False)
+        print('enters receive')
+        # trying to receive message
+        rec = False
+        try:
+            message = client.recv(1024)
+            print('past message')
+            if not message:
+                rec = False
+            else:
+                rec = True
+        except socket.error as e:
+            print("Error receiving data: %s" % e)
+        finally:
+            print('exits try')
+            if rec is True:
+                print('message received')
+            else:
+                print('no message received')
 
-        # placing on GUI
-        Label(frame, text=end, fg="blue", bg="lightgrey", font=("Lato", 16)).pack(side=TOP, anchor=NE)
+        # Replicating cipher / decyphering
+        if rec is True:
+            dcipher = AES.new(small_key, AES.MODE_EAX, nonce)
+            print(message)
+            bitMess = dcipher.decrypt(message)
+            print(bitMess)
+            end = bitMess.decode('utf-8')
+
+            # placing on GUI
+            Label(frame, text=end, fg="blue", bg="lightgrey", font=("Lato", 16)).pack(side=TOP, anchor=NE)
 
     # Button to send message
     Button(alice, text="Send", command=partial(send, cipher)).place(x=700, y=500)
 
+    # Waiting to receive a message
+    alice.after(1000, receive(nonce, small_key))
+
     # Keeps screen open until user closes windows
     alice.mainloop()
-
