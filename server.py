@@ -34,25 +34,27 @@ def handle_client(conn, addr):
 
     connected = True
     while connected:
-        msg_length = conn.recv(HEADER).decode(FORMAT)
-        if msg_length:
-            msg_length = int(msg_length)
-            msg = conn.recv(msg_length).decode(FORMAT)
-            if msg == DISCONNECT_MESSAGE:
-                connected = False
-                # remove the connection when no longer active
-                connections.remove((conn, addr))
+        msg = conn.recv(2048)
+        # msg_length = conn.recv(HEADER).decode(FORMAT)
+        # if msg_length:
+            # msg_length = int(msg_length)
+            # msg = conn.recv(msg_length).decode(FORMAT)
+        if msg == DISCONNECT_MESSAGE:
+            connected = False
+            # remove the connection when no longer active
+            connections.remove((conn, addr))
 
-            else:
-                print(f"[{addr}] {msg}")
-                # store message
-                message = f"[{addr}] {msg}"
-                messages.append(message)
+        else:
+            print(f"[{addr}] {msg}")
+            # store message
+            message = f"[{addr}] {msg}"
+            messages.append(message)
 
-                # send message to other clients
-                for connection, address in connections:
-                    if address != addr:
-                        connection.send(f"{message}\n".encode(FORMAT))
+            # send message to other clients
+            for connection, address in connections:
+                if address != addr:
+                    # connection.send(f"{message}\n".encode(FORMAT))
+                    connection.send(message)
 
     # disconnect the client when they leave the server
     conn.close()
